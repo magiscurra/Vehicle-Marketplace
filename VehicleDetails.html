@@ -122,38 +122,37 @@
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-  lucide.createIcons();
+      lucide.createIcons();
 
-  const vehicle = JSON.parse(localStorage.getItem("selectedVehicle"));
-  if (!vehicle) {
-    alert("No vehicle data found.");
-    window.location.href = "index.html";
-    return;
-  }
+      const vehicle = JSON.parse(localStorage.getItem("selectedVehicle"));
+      if (!vehicle) {
+        alert("No vehicle data found.");
+        window.location.href = "index.html";
+        return;
+      }
 
-  document.getElementById("vehicle-image").src = vehicle.image;
-  document.getElementById("vehicle-price").textContent = `$${vehicle.price.toLocaleString()}`;
-  document.getElementById("vehicle-title").textContent = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-  document.getElementById("vehicle-year").textContent = vehicle.year;
-  document.getElementById("vehicle-mileage").textContent = `${vehicle.mileage.toLocaleString()} mi`;
-  document.getElementById("vehicle-fuel").textContent = vehicle.fuelType;
-  document.getElementById("vehicle-transmission").textContent = vehicle.transmission || 'N/A';
-  document.getElementById("vehicle-description").textContent = vehicle.description;
-  document.getElementById("vehicle-condition").textContent = vehicle.condition || 'Used';
-  document.getElementById("vehicle-location").textContent = vehicle.location;
-  document.getElementById("sidebar-price").textContent = `$${vehicle.price.toLocaleString()}`;
-  document.getElementById("seller-name").textContent = vehicle.sellerName;
-});
+      document.getElementById("vehicle-image").src = vehicle.image || "";
+      document.getElementById("vehicle-price").textContent = `$${vehicle.price?.toLocaleString() || "0"}`;
+      document.getElementById("vehicle-title").textContent =
+        vehicle.title || [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ");
+      document.getElementById("vehicle-year").textContent = vehicle.year || "N/A";
+      document.getElementById("vehicle-mileage").textContent = vehicle.mileage ? `${vehicle.mileage.toLocaleString()} mi` : "N/A";
+      document.getElementById("vehicle-fuel").textContent = vehicle.fuel || vehicle.fuelType || "N/A";
+      document.getElementById("vehicle-transmission").textContent = vehicle.transmission || "N/A";
+      document.getElementById("vehicle-description").textContent = vehicle.description || "No description available.";
+      document.getElementById("vehicle-condition").textContent = vehicle.condition || "Used";
+      document.getElementById("vehicle-location").textContent = vehicle.location || "Unknown";
+      document.getElementById("sidebar-price").textContent = `$${vehicle.price?.toLocaleString() || "0"}`;
+      document.getElementById("seller-name").textContent = vehicle.owner || vehicle.sellerName || "Admin";
+    });
 
-function goBack() {
-  window.history.back();
-}
+    function goBack() {
+      window.history.back();
+    }
 
-function handleInterest() {
-  alert("Interest expressed in this vehicle!");
-}
-
-
+    function handleInterest() {
+      alert("Interest expressed in this vehicle!");
+    }
   </script>
 </body>
 </html>

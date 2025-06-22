@@ -1,4 +1,4 @@
-const currentUser = null; 
+const currentUser = null;
 
 const guestButtons = document.getElementById("guest-buttons");
 const userDropdown = document.getElementById("user-dropdown");
@@ -7,14 +7,6 @@ const usernameSpan = document.getElementById("username");
 
 function toggleUserMenu() {
   userMenu.classList.toggle("hidden");
-}
-
-function showLoginModal() {
-  alert("Show login modal");
-}
-
-function showSignupModal() {
-  alert("Show signup modal");
 }
 
 function logout() {
@@ -27,107 +19,181 @@ function goToDashboard() {
   alert("Navigate to dashboard");
 }
 
-document.getElementById("search-form").addEventListener("submit", function (e) {
+document.getElementById("search-form")?.addEventListener("submit", function (e) {
   e.preventDefault();
   const query = document.getElementById("search-input").value;
   alert("Searching for: " + query);
 });
 
-function viewVehicleDetails(vehicleId) {
-  const selectedVehicle = vehicles.find(v => v.id === vehicleId);
-  if (selectedVehicle) {
-    localStorage.setItem('selectedVehicle', JSON.stringify(selectedVehicle));
-    window.location.href = 'VehicleDetails.html';
+function ensureVehiclesExist() {
+  let existing = JSON.parse(localStorage.getItem("vehicles"));
+  if (!existing || existing.length === 0) {
+    existing = [
+      {
+        id: Date.now(),
+        year: 2020,
+        make: "Honda",
+        model: "Civic",
+        mileage: 45000,
+        fuelType: "Petrol",
+        transmission: "Automatic",
+        condition: "Excellent",
+        price: 12000,
+        image: "rolls-royce-phantom-v-1.jpg",
+        description: "Reliable and fuel-efficient compact car.",
+        location: "New York, NY",
+        sellerName: "Admin"
+      }
+    ];
+    localStorage.setItem("vehicles", JSON.stringify(existing));
   }
 }
-
-const vehicles = [
-  {
-    id: 1,
-    year: 2020,
-    make: "Honda",
-    model: "Civic",
-    mileage: 45000,
-    fuelType: "Petrol",
-    transmission: "Automatic",
-    condition: "Excellent",
-    price: 12000,
-    image: "rolls-royce-phantom-v-1.jpg",
-    description: "Reliable and fuel-efficient compact car with great mileage and safety features.",
-    location: "New York, NY",
-    sellerName: "John Doe"
-  },
-  {
-    id: 2,
-    year: 2012,
-    make: "Honda",
-    model: "Civic",
-    mileage: 45000,
-    fuelType: "Petrol",
-    transmission: "Automatic",
-    condition: "Excellent",
-    price: 10500,
-    image: "rolls-royce-phantom-v-1.jpg",
-    description: "Reliable and fuel-efficient compact car with great mileage and safety features.",
-    location: "New York, NY",
-    sellerName: "John Doe"
-  },
-  {
-    id: 3,
-    year: 2010,
-    make: "Honda",
-    model: "Civic",
-    mileage: 45000,
-    fuelType: "Petrol",
-    transmission: "Automatic",
-    condition: "Excellent",
-    price: 12500,
-    image: "rolls-royce-phantom-v-1.jpg",
-    description: "Reliable and fuel-efficient compact car with great mileage and safety features.",
-    location: "New York, NY",
-    sellerName: "John Doe"
-  },
-  // Add more vehicles here...
-];
 
 function renderVehicleCard(vehicle) {
   return `
-    <div onclick="viewVehicleDetails(${vehicle.id})" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer transform hover:scale-105 duration-200">
+    <div onclick="viewVehicleDetails(${vehicle.id})" class="bg-white rounded-lg shadow-md hover:shadow-lg cursor-pointer transform hover:scale-105 duration-200 overflow-hidden">
       <div class="relative h-48 bg-gray-200">
-        <img src="${vehicle.image}" alt="${vehicle.make} ${vehicle.model}" class="w-full h-full object-cover" />
+        <img src="${vehicle.image}"  class="w-full h-full object-cover" />
         <div class="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-sm font-medium">
-          $${vehicle.price.toLocaleString()}
+          $${vehicle.price}
         </div>
       </div>
       <div class="p-4">
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">
-          ${vehicle.year} ${vehicle.make} ${vehicle.model}
-        </h3>
-        <div class="grid grid-cols-3 gap-2 text-sm text-gray-600 mb-3">
-          <div class="flex items-center space-x-1"><span>📅</span><span>${vehicle.year}</span></div>
-          <div class="flex items-center space-x-1"><span>⏱️</span><span>${vehicle.mileage.toLocaleString()} mi</span></div>
-          <div class="flex items-center space-x-1"><span>⛽</span><span>${vehicle.fuelType}</span></div>
-        </div>
-        <p class="text-gray-700 text-sm mb-3">${vehicle.description}</p>
-        <div class="flex justify-between items-center text-sm text-gray-500">
+        <h3 class="text-xl font-semibold">${vehicle.title}</h3>
+        <p class="text-sm text-gray-600 mb-2">${vehicle.description}</p>
+        <div class="text-sm text-gray-500 flex justify-between">
           <span>${vehicle.location}</span>
-          <span>by ${vehicle.sellerName}</span>
+          <span>by ${vehicle.owner}</span>
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  if (currentUser) {
-    usernameSpan.textContent = currentUser.name;
-    guestButtons.classList.add("hidden");
-    userDropdown.classList.remove("hidden");
+function viewVehicleDetails(vehicleId) {
+  const vehicles = JSON.parse(localStorage.getItem("vehicles")) || [];
+  const selectedVehicle = vehicles.find(v => v.id === vehicleId);
+  if (selectedVehicle) {
+    localStorage.setItem("selectedVehicle", JSON.stringify(selectedVehicle));
+    window.location.href = "VehicleDetails.html";
   }
+}
 
-  const grid = document.getElementById('vehicle-grid');
-  const resultCount = document.getElementById('result-count');
+if (window.location.pathname.includes("index.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/")) {
+  ensureVehiclesExist();
 
-  resultCount.textContent = `${vehicles.length} vehicle${vehicles.length !== 1 ? 's' : ''} found`;
-  grid.innerHTML = vehicles.map(renderVehicleCard).join('');
-});
+  document.addEventListener("DOMContentLoaded", () => {
+    const grid = document.getElementById("vehicle-grid");
+    const resultCount = document.getElementById("result-count");
+
+    const vehicles = JSON.parse(localStorage.getItem("vehicles")) || [];
+
+    if (grid && resultCount) {
+      grid.innerHTML = vehicles.map(renderVehicleCard).join("");
+      resultCount.textContent = `${vehicles.length} vehicle${vehicles.length !== 1 ? "s" : ""} found`;
+    }
+  });
+}
+
+if (window.location.pathname.includes("admin.html")) {
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("vehicle-form");
+    const list = document.getElementById("vehicle-list");
+
+    function getVehicles() {
+      return JSON.parse(localStorage.getItem("vehicles")) || [];
+    }
+
+    function saveVehicles(vehicles) {
+      localStorage.setItem("vehicles", JSON.stringify(vehicles));
+    }
+
+    function renderVehicles() {
+      const vehicles = getVehicles();
+      list.innerHTML = "";
+      vehicles.forEach((v, index) => {
+        const card = document.createElement("div");
+        card.className = "bg-white p-4 rounded shadow flex justify-between items-start";
+        card.innerHTML = `
+          <div>
+            <h3 class="text-lg font-semibold">${v.title || 'Untitled Vehicle'}</h3>
+            <p><strong>Owner:</strong> ${v.owner}</p>
+            <p><strong>Price:</strong> ${v.price}</p>
+            <p><strong>Fuel:</strong> ${v.fuel || v.fuelType}</p>
+            <p><strong>Location:</strong> ${v.location}</p>
+            <p><strong>Description:</strong> ${v.description}</p>
+          </div>
+          <div class="space-y-2">
+            <button onclick="editVehicle(${index})" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
+            <button onclick="deleteVehicle(${index})" class="bg-red-600 text-white px-2 py-1 rounded">Delete</button>
+          </div>`;
+        list.appendChild(card);
+      });
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("title").value;
+      const owner = document.getElementById("owner").value;
+      const price = document.getElementById("price").value;
+      const fuel = document.getElementById("fuel").value;
+      const speed = document.getElementById("speed").value;
+      const location = document.getElementById("location").value;
+      const description = document.getElementById("description").value;
+      const imageInput = document.getElementById("image");
+      const imageFile = imageInput.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageData = reader.result;
+        const newVehicle = {
+          id: Date.now(),
+          title,
+          owner,
+          price,
+          fuel,
+          speed,
+          location,
+          description,
+          image: imageData,
+          sellerName: "Admin"
+        };
+
+        const vehicles = getVehicles();
+        vehicles.push(newVehicle);
+        saveVehicles(vehicles);
+        form.reset();
+        renderVehicles();
+      };
+
+      if (imageFile) {
+        reader.readAsDataURL(imageFile);
+      } else {
+        alert("Please upload an image");
+      }
+    });
+
+    window.editVehicle = function (index) {
+      const vehicles = getVehicles();
+      const v = vehicles[index];
+      document.getElementById("title").value = v.title;
+      document.getElementById("price").value = v.price;
+      document.getElementById("fuel").value = v.fuel;
+      document.getElementById("speed").value = v.speed;
+      document.getElementById("location").value = v.location;
+      document.getElementById("description").value = v.description;
+
+      vehicles.splice(index, 1);
+      saveVehicles(vehicles);
+      renderVehicles();
+    };
+
+    window.deleteVehicle = function (index) {
+      const vehicles = getVehicles();
+      vehicles.splice(index, 1);
+      saveVehicles(vehicles);
+      renderVehicles();
+    };
+
+    renderVehicles();
+  });
+}
